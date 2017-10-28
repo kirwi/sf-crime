@@ -10,7 +10,7 @@ class Crimes(db.Model):
     cat = db.Column(db.Text, index=True)
     descr = db.Column(db.Text)
     dist = db.Column(db.Text)
-    datetimte = db.Column(db.DateTime, index=True)
+    datetime = db.Column(db.DateTime, index=True)
     lng = db.Column(db.Float)
     lat = db.Column(db.Float)
 

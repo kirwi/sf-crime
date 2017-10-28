@@ -4,15 +4,15 @@ mapboxgl.accessToken = accessToken;
 var map = new mapboxgl.Map({
     container: "map",
     style: "mapbox://styles/mapbox/light-v9",
-    center: [-118.25, 34.05],
-    zoom: 10
+    center: [-122.431297, 37.773972],
+    zoom: 11.5
 });
 
 map.on("load", function (e) {
 
     map.addSource("crimes", {
         type: "geojson",
-        data: "ROBBERY/2012",
+        data: "ROBBERY/2003",
         cluster: true,
         clusterRadius: 50,
         clusterMaxZoom: 13,

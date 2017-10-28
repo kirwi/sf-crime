@@ -14,12 +14,13 @@ body, html {
 
 #map {
   float: left;
+  width: 80%;
   height: 100%
 }
 
 #container {
-  margin: 0;
-  padding: 10% 5%;
+  margin: 10% 5%;
+  padding: 0;
 }
 
 hr {
@@ -29,4 +30,8 @@ hr {
   border-top: 1px solid #ccc;
   margin: 1em 0;
   padding: 0;
+}
+
+#slider {
+  width: 100%;
 }
