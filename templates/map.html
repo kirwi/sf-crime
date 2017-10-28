@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>San Francsico Crime Visualization</title>
+  <meta charset="utf-8">
+  <link href="url_for('static', 'css/map.css')" rel="stylesheet" />
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.41.0/mapbox-gl.css"
+    rel="stylesheet" />
+</head>
+
+<body>
+  <div id="sidebar">
+    <div id="container">
+      <h1>Crime in San Francisco, CA</h1>
+      <p>Vizualize crimes from 2003 to 2017 in a number of different crime
+        categories. Select a different crime from the drop-down menu, and
+        select a different year by moving the slider left or right.</p>
+      <hr>
+      <p>Crime: <span id="crime">Robbery</span></p>
+      <p>Year: <span id="year">2003</span></p>
+      <input id="slider" type="range" min="2003" max="2017" step="1" value=2003 />
+    </div>
+  </div>
+  <div id="map"></div>
+
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.41.0/mapbox-gl.js"></script>
+  <script src="url_for('static', 'javascript/map.js')"></script>
+</body>
+
+</html>
