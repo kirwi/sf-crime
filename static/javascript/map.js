@@ -73,6 +73,39 @@ map.on("load", function (e) {
     });
 });
 
+var barSvg = d3.select("#barchart"),
+    margin = {top: 10, right: 10, bottom: 10, left: 10},
+    container = document.querySelector(".chart-container"),
+    barSvgWidth = +container.offsetWidth,
+    barSvgHeight = +container.offsetHeight,
+    width = barSvgWidth - margin.left - margin.right,
+    height = barSvgHeight - margin.top - margin.bottom;
+
+console.log(width, height);
+
+var g = barSvg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var x = d3.scaleBand().rangeRound([0, width]).padding(0.1);
+var y = d3.scaleLinear().rangeRound([height, 0]);
+
+d3.json("/agg/day/ROBBERY", function(data){
+    var title = data.crime,
+        aggregates = data.aggregates;
+
+    x.domain(aggregates.map(function(d) { return d.day; }));
+    y.domain([0, d3.max(aggregates, function(d) { return d.occurrences; })]);
+
+    g.selectAll(".bar")
+        .data(aggregates)
+        .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", function(d) { return x(d.day); })
+        .attr("y", function(d) { return y(d.occurrences); })
+        .attr("width", x.bandwidth())
+        .attr("height", function(d) { return height - y(d.occurrences); });
+});
+
 document.getElementById("slider").addEventListener("input", function (e) {
     var year = parseInt(e.target.value);
     var dataString = "ROBBERY/" + year;
