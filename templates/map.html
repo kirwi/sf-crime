@@ -12,13 +12,15 @@
 <body>
   <div id="sidebar">
     <div id="container">
-      <p>Vizualize crimes from 2003 to 2017 in a number of different crime
-        categories. Select a different crime from the drop-down menu, and
-        select a different year by moving the slider left or right.</p>
-      <h3>Crime: <span id="crime">ROBBERY</span></h3>
-      <input id="slider" type="range" min="2003" max="2017" step="1" value=2003 />
-      <div class="chart-contaier"><svg id="linechart"></svg></div>
-      <div class="chart-container"><svg id="barchart"></svg></div>
+      <h3 id="crime" class="container-header">ROBBERY</h3>
+      <div class="year-container">
+        <h3 id="year" class="container-header">2003</h3>
+        <input id="slider" type="range" min="2003" max="2017" step="1" value=2003>
+      </div>
+      <p>Crimes per month</p>
+      <div class="chart-container"><svg id="linechart"></svg></div>
+      <p>Crimes per day</p>
+      <div class="chart-container"><svg id="piechart"></svg></div>
     </div>
   </div>
   <div id="map"></div>

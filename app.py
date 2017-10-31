@@ -18,23 +18,28 @@ def geo_json(crime, year):
                 ).all()
     return jsonify({
         'type': 'FeatureCollection',
-        'features': [point.geo_json_point() for point in points]
+        'features': [ point.geo_json_point() for point in points ]
     })
 
-@app.route('/agg/year/<crime>')
-def agg_year(crime):
+@app.route('/agg/month/<crime>/<year>')
+def agg_date(crime, year):
     data = Crimes.query.with_entities(
-                extract('year', Crimes.datetime).label('year'),
-                func.count(Crimes.cat)).filter(Crimes.cat == crime
-                ).group_by('year').order_by('year').all()
+        func.date_trunc('month', Crimes.datetime).label('month'),
+        func.count(Crimes.cat)
+        ).filter(Crimes.cat == crime
+        ).filter(extract('year', Crimes.datetime) == year
+        ).group_by('month'
+        ).order_by('month'
+        ).all()
+
     return jsonify({
         'crime': crime,
-        'aggregates': [{'year': year, 'occurrences': occurence}
-            for year, occurence in data]
+        'aggregates': [ {'date': date, 'occurrences': occurrences}
+            for date, occurrences in data ]
     })
 
-@app.route('/agg/day/<crime>')
-def agg_week(crime):
+@app.route('/agg/day/<crime>/<year>')
+def agg_week(crime, year):
     week_days = {
         0: 'Sun',
         1: 'Mon',
@@ -44,14 +49,20 @@ def agg_week(crime):
         5: 'Fri',
         6: 'Sat'
     }
+
     data = Crimes.query.with_entities(
-                extract('dow', Crimes.datetime).label('day'),
-                func.count(Crimes.cat)).filter(Crimes.cat == crime
-                ).group_by('day').order_by('day').all()
+        extract('dow', Crimes.datetime).label('day'),
+        func.count(Crimes.cat)
+        ).filter(Crimes.cat == crime
+        ).filter(extract('year', Crimes.datetime) == year
+        ).group_by('day'
+        ).order_by('day'
+        ).all()
+
     return jsonify({
         'crime': crime,
-        'aggregates': [ {'day': week_days[day], 'occurrences': occurence}
-            for day, occurence in data ]
+        'aggregates': [ {'day': week_days[day], 'occurrences': occurences}
+            for day, occurences in data ]
     })
 
 if __name__ == '__main__':

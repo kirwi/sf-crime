@@ -73,37 +73,92 @@ map.on("load", function (e) {
     });
 });
 
-var barSvg = d3.select("#barchart"),
-    margin = {top: 10, right: 10, bottom: 10, left: 10},
+var pieSvg = d3.select("#piechart"),
+    lineSvg = d3.select("#linechart"),
+    margin = {top: 0, right: 0, bottom: 20, left: 25},
     container = document.querySelector(".chart-container"),
-    barSvgWidth = +container.offsetWidth,
-    barSvgHeight = +container.offsetHeight,
-    width = barSvgWidth - margin.left - margin.right,
-    height = barSvgHeight - margin.top - margin.bottom;
+    containerWidth = +container.offsetWidth,
+    containerHeight = +container.offsetHeight,
+    width = containerWidth - margin.left - margin.right,
+    height = containerHeight - margin.top - margin.bottom,
+    parseTime = d3.timeParse("%a, %d %b %Y %H:%M:%S GMT"),
+    formatMonth = d3.timeFormat("%b");
 
-console.log(width, height);
-
-var g = barSvg.append("g")
+var lines = lineSvg.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var wedges = pieSvg.append("g")
+    .attr("transform", "translate(" + containerWidth / 2 + "," +
+        containerHeight / 2 + ")");
 
-var x = d3.scaleBand().rangeRound([0, width]).padding(0.1);
-var y = d3.scaleLinear().rangeRound([height, 0]);
+var linesX = d3.scaleTime().rangeRound([0, width]),
+    linesY = d3.scaleLinear().rangeRound([height, 0]),
+    radius = Math.min(containerWidth, containerHeight) / 2,
+    color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b",
+        "#a05d56", "#d0743c", "#ff8c00"]);
 
-d3.json("/agg/day/ROBBERY", function(data){
-    var title = data.crime,
-        aggregates = data.aggregates;
+d3.json("/agg/day/ROBBERY/2003", function(data){
 
-    x.domain(aggregates.map(function(d) { return d.day; }));
-    y.domain([0, d3.max(aggregates, function(d) { return d.occurrences; })]);
+    var pie = d3.pie()
+        .sort(null)
+        .value(function(d) { return d.occurrences; });
 
-    g.selectAll(".bar")
-        .data(aggregates)
-        .enter().append("rect")
-        .attr("class", "bar")
-        .attr("x", function(d) { return x(d.day); })
-        .attr("y", function(d) { return y(d.occurrences); })
-        .attr("width", x.bandwidth())
-        .attr("height", function(d) { return height - y(d.occurrences); });
+    var path = d3.arc()
+        .outerRadius(radius)
+        .innerRadius(0);
+
+    var label = d3.arc()
+        .outerRadius(radius - 40)
+        .innerRadius(radius - 40);
+
+    var arc = wedges.selectAll(".arc")
+        .data(pie(data.aggregates))
+        .enter().append("g")
+        .attr("class", "arc");
+
+    arc.append("path")
+        .attr("d", path)
+        .attr("fill", function(d) { return color(d.data.occurrences); });
+
+    arc.append("text")
+        .attr("transform", function(d) {
+            return "translate(" + label.centroid(d) + ")";
+        })
+        .attr("dy", "0.35em")
+        .text(function(d) { return d.data.day; });
+
+});
+
+d3.json("/agg/month/ROBBERY/2003", function(data) {
+
+    var line = d3.line()
+        .x(function(d) { return linesX(new Date(d.date)); })
+        .y(function(d) { return linesY(d.occurrences); });
+
+    linesX.domain(d3.extent(data.aggregates,
+        function(d) { return new Date(d.date); }));
+    linesY.domain(d3.extent(data.aggregates,
+        function(d) { return d.occurrences; }));
+
+    lines.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(linesX).tickFormat(formatMonth).ticks(4));
+
+    lines.append("g")
+        .call(d3.axisLeft(linesY).ticks(5))
+        .append("text")
+        .attr("fill", "#000")
+        .attr("transform", "rotate(-90)")
+        // .attr("y", 0)
+        .attr("text-anchor", "end");
+
+    lines.append("path")
+        .datum(data.aggregates)
+        .attr("fill", "none")
+        .attr("stroke", "steelblue")
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-linecap", "round")
+        .attr("stroke-width", 3.0)
+        .attr("d", line);
 });
 
 document.getElementById("slider").addEventListener("input", function (e) {
