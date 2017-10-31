@@ -73,6 +73,9 @@ map.on("load", function (e) {
     });
 });
 
+drawLineChart("ROBBERY", 2003);
+drawPieChart("ROBBERY", 2003);
+
 var pieSvg = d3.select("#piechart"),
     lineSvg = d3.select("#linechart"),
     margin = {top: 0, right: 0, bottom: 20, left: 25},
@@ -96,74 +99,80 @@ var linesX = d3.scaleTime().rangeRound([0, width]),
     color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b",
         "#a05d56", "#d0743c", "#ff8c00"]);
 
-d3.json("/agg/day/ROBBERY/2003", function(data){
+function drawPieChart(crime, year) {
+    d3.json("/agg/day/" + crime + "/" year, function(data){
 
-    var pie = d3.pie()
-        .sort(null)
-        .value(function(d) { return d.occurrences; });
+        var pie = d3.pie()
+            .sort(null)
+            .value(function(d) { return d.occurrences; });
 
-    var path = d3.arc()
-        .outerRadius(radius)
-        .innerRadius(0);
+        var path = d3.arc()
+            .outerRadius(radius)
+            .innerRadius(0);
 
-    var label = d3.arc()
-        .outerRadius(radius - 40)
-        .innerRadius(radius - 40);
+        var label = d3.arc()
+            .outerRadius(radius - 40)
+            .innerRadius(radius - 40);
 
-    var arc = wedges.selectAll(".arc")
-        .data(pie(data.aggregates))
-        .enter().append("g")
-        .attr("class", "arc");
+        var arc = wedges.selectAll(".arc")
+            .data(pie(data.aggregates))
+            .enter().append("g")
+            .attr("class", "arc");
 
-    arc.append("path")
-        .attr("d", path)
-        .attr("fill", function(d) { return color(d.data.occurrences); });
+        arc.append("path")
+            .attr("d", path)
+            .attr("fill", function(d) { return color(d.data.occurrences); });
 
-    arc.append("text")
-        .attr("transform", function(d) {
-            return "translate(" + label.centroid(d) + ")";
-        })
-        .attr("dy", "0.35em")
-        .text(function(d) { return d.data.day; });
+        arc.append("text")
+            .attr("transform", function(d) {
+                return "translate(" + label.centroid(d) + ")";
+            })
+            .attr("dy", "0.35em")
+            .text(function(d) { return d.data.day; });
 
-});
+    });
+}
 
-d3.json("/agg/month/ROBBERY/2003", function(data) {
+function drawLineChart(crime, year) {
+    d3.json("/agg/month/" + crime + "/" + year, function(data) {
 
-    var line = d3.line()
-        .x(function(d) { return linesX(new Date(d.date)); })
-        .y(function(d) { return linesY(d.occurrences); });
+        var line = d3.line()
+            .x(function(d) { return linesX(new Date(d.date)); })
+            .y(function(d) { return linesY(d.occurrences); });
 
-    linesX.domain(d3.extent(data.aggregates,
-        function(d) { return new Date(d.date); }));
-    linesY.domain(d3.extent(data.aggregates,
-        function(d) { return d.occurrences; }));
+        linesX.domain(d3.extent(data.aggregates,
+            function(d) { return new Date(d.date); }));
+        linesY.domain(d3.extent(data.aggregates,
+            function(d) { return d.occurrences; }));
 
-    lines.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(linesX).tickFormat(formatMonth).ticks(4));
+        lines.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(linesX).tickFormat(formatMonth).ticks(4));
 
-    lines.append("g")
-        .call(d3.axisLeft(linesY).ticks(5))
-        .append("text")
-        .attr("fill", "#000")
-        .attr("transform", "rotate(-90)")
-        // .attr("y", 0)
-        .attr("text-anchor", "end");
+        lines.append("g")
+            .call(d3.axisLeft(linesY).ticks(5))
+            .append("text")
+            .attr("fill", "#000")
+            .attr("transform", "rotate(-90)")
+            // .attr("y", 0)
+            .attr("text-anchor", "end");
 
-    lines.append("path")
-        .datum(data.aggregates)
-        .attr("fill", "none")
-        .attr("stroke", "steelblue")
-        .attr("stroke-linejoin", "round")
-        .attr("stroke-linecap", "round")
-        .attr("stroke-width", 3.0)
-        .attr("d", line);
-});
+        lines.append("path")
+            .datum(data.aggregates)
+            .attr("fill", "none")
+            .attr("stroke", "steelblue")
+            .attr("stroke-linejoin", "round")
+            .attr("stroke-linecap", "round")
+            .attr("stroke-width", 3.0)
+            .attr("d", line);
+    });
+}
 
 document.getElementById("slider").addEventListener("input", function (e) {
     var year = parseInt(e.target.value);
     var dataString = "ROBBERY/" + year;
     map.getSource("crimes").setData(dataString);
     document.getElementById("year").innerText = year;
+    drawPieChart("ROBBERY", year);
+    drawLineChart("ROBBERY", year);
 });
