@@ -73,9 +73,6 @@ map.on("load", function (e) {
     });
 });
 
-drawLineChart("ROBBERY", 2003);
-drawPieChart("ROBBERY", 2003);
-
 var pieSvg = d3.select("#piechart"),
     lineSvg = d3.select("#linechart"),
     margin = {top: 0, right: 0, bottom: 20, left: 25},
@@ -99,12 +96,19 @@ var linesX = d3.scaleTime().rangeRound([0, width]),
     color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b",
         "#a05d56", "#d0743c", "#ff8c00"]);
 
-function drawPieChart(crime, year) {
-    d3.json("/agg/day/" + crime + "/" year, function(data){
+var line = d3.line()
+    .x(function(d) { return linesX(new Date(d.date)); })
+    .y(function(d) { return linesY(d.occurrences); });
 
-        var pie = d3.pie()
-            .sort(null)
-            .value(function(d) { return d.occurrences; });
+var pie = d3.pie()
+    .sort(null)
+    .value(function(d) { return d.occurrences; });
+
+drawLineChart("ROBBERY", 2003);
+drawPieChart("ROBBERY", 2003);
+
+function drawPieChart(crime, year) {
+    d3.json("/agg/day/" + crime + "/" + year, function(data){
 
         var path = d3.arc()
             .outerRadius(radius)
@@ -136,10 +140,6 @@ function drawPieChart(crime, year) {
 function drawLineChart(crime, year) {
     d3.json("/agg/month/" + crime + "/" + year, function(data) {
 
-        var line = d3.line()
-            .x(function(d) { return linesX(new Date(d.date)); })
-            .y(function(d) { return linesY(d.occurrences); });
-
         linesX.domain(d3.extent(data.aggregates,
             function(d) { return new Date(d.date); }));
         linesY.domain(d3.extent(data.aggregates,
@@ -164,15 +164,23 @@ function drawLineChart(crime, year) {
             .attr("stroke-linejoin", "round")
             .attr("stroke-linecap", "round")
             .attr("stroke-width", 3.0)
+            .attr("class", "line")
             .attr("d", line);
     });
 }
 
-document.getElementById("slider").addEventListener("input", function (e) {
-    var year = parseInt(e.target.value);
+d3.selectAll("input").on("change", function () {
+    var year = this.value;
     var dataString = "ROBBERY/" + year;
     map.getSource("crimes").setData(dataString);
     document.getElementById("year").innerText = year;
-    drawPieChart("ROBBERY", year);
-    drawLineChart("ROBBERY", year);
+    d3.json("/agg/month/ROBBERY/" + year, function(data) {
+        linesX.domain(d3.extent(data.aggregates,
+            function(d) { return new Date(d.date); }));
+        linesY.domain(d3.extent(data.aggregates,
+            function(d) { return d.occurrences; }));
+        d3.select(".line").transition().duration(400)
+          .attr("d", line(data.aggregates));
+    });
+    // t.selectAll()
 });

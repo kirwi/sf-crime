@@ -7,12 +7,22 @@
   <link href="{{ url_for('static', filename='css/map.css') }}" rel="stylesheet" />
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.41.0/mapbox-gl.css"
     rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    rel="stylesheet" />
 </head>
 
 <body>
   <div id="sidebar">
     <div id="container">
-      <h3 id="crime" class="container-header">ROBBERY</h3>
+      <div class="dropdown">
+        <h3 class="container-header dropbtn" id="crime" class="container-header">ROBBERY</h3>
+        <!-- <i class= "dropdown" class="fa fa-angle-down"></i> -->
+        <div class="dropdown-content">
+          {% for crime in crimes %}
+            <p>{{ crime[0] }}</p>
+          {% endfor %}
+        </div>
+      </div>
       <div class="year-container">
         <h3 id="year" class="container-header">2003</h3>
         <input id="slider" type="range" min="2003" max="2017" step="1" value=2003>

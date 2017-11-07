@@ -1,6 +1,6 @@
 from flask import Flask, render_template, jsonify
 from models import db, Crimes
-from sqlalchemy import extract, func
+from sqlalchemy import extract, func, distinct
 import os
 
 app = Flask(__name__)
@@ -9,7 +9,8 @@ db.init_app(app)
 
 @app.route('/')
 def index():
-    return render_template('map.html')
+    crimes = Crimes.query.with_entities(distinct(Crimes.cat)).all()
+    return render_template('map.html', crimes=crimes)
 
 @app.route('/<crime>/<year>')
 def geo_json(crime, year):
