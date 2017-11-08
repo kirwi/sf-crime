@@ -169,12 +169,13 @@ function drawLineChart(crime, year) {
     });
 }
 
-d3.selectAll("input").on("change", function () {
+d3.select("#slider").on("change", function() {
     var year = this.value;
-    var dataString = "ROBBERY/" + year;
+    var crime = document.getElementById("crime").textContent;
+    var dataString = "/" + crime + "/" + year;
     map.getSource("crimes").setData(dataString);
-    document.getElementById("year").innerText = year;
-    d3.json("/agg/month/ROBBERY/" + year, function(data) {
+    document.getElementById("year").textContent = year;
+    d3.json("/agg/month/" + crime + "/" + year, function(data) {
         linesX.domain(d3.extent(data.aggregates,
             function(d) { return new Date(d.date); }));
         linesY.domain(d3.extent(data.aggregates,
@@ -182,5 +183,16 @@ d3.selectAll("input").on("change", function () {
         d3.select(".line").transition().duration(400)
           .attr("d", line(data.aggregates));
     });
-    // t.selectAll()
+
+});
+
+var menu = document.getElementById("menu")
+menu.addEventListener("click", function(e) {
+    var crime = e.target.innerHTML;
+    console.log(e);
+    console.log(crime);
+    document.getElementById("crime").textContent = crime;
+    var year = document.getElementById("slider").value = 2003;
+    var dataString = "/" + crime + "/" + 2003;
+    map.getSource("crimes").setData(dataString);
 });

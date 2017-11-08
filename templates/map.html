@@ -15,9 +15,9 @@
   <div id="sidebar">
     <div id="container">
       <div class="dropdown">
-        <h3 class="container-header dropbtn" id="crime" class="container-header">ROBBERY</h3>
+        <h3 class="container-header dropbtn" id="crime">ROBBERY</h3>
         <!-- <i class= "dropdown" class="fa fa-angle-down"></i> -->
-        <div class="dropdown-content">
+        <div class="dropdown-content" id="menu">
           {% for crime in crimes %}
             <p>{{ crime[0] }}</p>
           {% endfor %}
