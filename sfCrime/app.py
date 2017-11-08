@@ -1,11 +1,10 @@
 from flask import Flask, render_template, jsonify
-from models import db, Crimes
-from sqlalchemy import extract, func
-import os
+from sfCrime.models import sfcrime
+from sqlalchemy import create_engine
+from sfCrime import app
+
 
 app = Flask(__name__)
-app.config.from_object(os.environ['APP_SETTINGS'])
-db.init_app(app)
 
 @app.route('/')
 def index():
@@ -13,9 +12,7 @@ def index():
 
 @app.route('/<crime>/<year>')
 def geo_json(crime, year):
-    points = Crimes.query.filter(Crimes.cat == crime
-                ).filter(extract('year', Crimes.datetime) == year
-                ).all()
+    points = engine.execute()
     return jsonify({
         'type': 'FeatureCollection',
         'features': [ point.geo_json_point() for point in points ]
@@ -65,5 +62,3 @@ def agg_week(crime, year):
             for day, occurences in data ]
     })
 
-if __name__ == '__main__':
-    app.run()
