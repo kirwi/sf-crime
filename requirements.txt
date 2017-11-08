@@ -6,5 +6,6 @@ itsdangerous==0.24
 Jinja2==2.9.6
 MarkupSafe==1.0
 psycopg2==2.7.3.2
-SQLAlchemy==1.1.14
+-e git+https://github.com/kirwi/sf-crime.git@9104a1759ac2db1978b9c12c2cd4cc734e1cfc6c#egg=sfCrime
+SQLAlchemy==1.2.0b3
 Werkzeug==0.12.2
