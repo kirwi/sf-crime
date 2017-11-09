@@ -1,20 +1,17 @@
 from flask import Flask, render_template, jsonify
-<<<<<<< HEAD:app.py
-from models import db, Crimes
 from sqlalchemy import extract, func, distinct
 import os
-=======
 from sfCrime.models import sfcrime
-from sqlalchemy import create_engine
 from sfCrime import app
-
->>>>>>> scroall:sfCrime/app.py
+from sqlalchemy import text
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
-    crimes = Crimes.query.with_entities(distinct(Crimes.cat)).all()
+    connection = sfcrime.db_init()
+    Crimes=connection
+    crimes = Crimes.query(sfcrime.sfCrimes.cat).distinct().all()
     return render_template('map.html', crimes=crimes)
 
 @app.route('/<crime>/<year>')
@@ -27,6 +24,11 @@ def geo_json(crime, year):
 
 @app.route('/agg/month/<crime>/<year>')
 def agg_date(crime, year):
+    connection = sfcrime.db_init()
+    Crimes = connection
+    Crimes.query(sfcrime.sfCrimes).with_entities(func.date_trunc('month', sfcrime.sfCrimes.datetime).label('month'),
+                                                     func.count(sfcrime.sfCrimes.cat)).filter(Crimes.cat == crime).filter(extract('year',
+                                                        Crimes.datetime) == year).group_by('month').order_by('month').all
     data = Crimes.query.with_entities(
         func.date_trunc('month', Crimes.datetime).label('month'),
         func.count(Crimes.cat)

@@ -12,18 +12,18 @@ Base= declarative_base()
 
 class Connection():
     def __init__(self):
-        self.db_url = url="postgresql+psycopg2://localhost:5432/sfcrimes"
-    def url(self):
-        return self.db_url
-    def engine(url=url()):
-       return create_engine(url)
+        self.db_url = "postgresql://localhost:5432/sfcrimes"
+
+    def engine(self):
+       return create_engine(self.db_url)
     def session(engine):
        return sessionmaker(bind=engine)
-    def connection(session):
-       return session()
-    def link(self):
 
 
+def db_init():
+    rt = Connection().engine()
+    session=Connection.session(rt)
+    return session()
 
 
 class sfCrimes(Base):
