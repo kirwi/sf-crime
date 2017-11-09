@@ -192,7 +192,8 @@ menu.addEventListener("click", function(e) {
     console.log(e);
     console.log(crime);
     document.getElementById("crime").textContent = crime;
-    var year = document.getElementById("slider").value = 2003;
+    document.getElementById("slider").value = 2003;
+    document.getElementById("year").textContent = 2003;
     var dataString = "/" + crime + "/" + 2003;
     map.getSource("crimes").setData(dataString);
 });
