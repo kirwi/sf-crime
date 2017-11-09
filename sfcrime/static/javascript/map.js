@@ -172,6 +172,7 @@ function drawLineChart(crime, year) {
 d3.select("#slider").on("change", function() {
     var year = this.value;
     var crime = document.getElementById("crime").textContent;
+    // crime = encodeURIComponent(crime);
     var dataString = "/" + crime + "/" + year;
     map.getSource("crimes").setData(dataString);
     document.getElementById("year").textContent = year;
@@ -189,10 +190,9 @@ d3.select("#slider").on("change", function() {
 var menu = document.getElementById("menu")
 menu.addEventListener("click", function(e) {
     var crime = e.target.innerHTML;
-    console.log(e);
-    console.log(crime);
     document.getElementById("crime").textContent = crime;
-    var year = document.getElementById("slider").value = 2003;
+    document.getElementById("slider").value = 2003;
+    document.getElementById("year").textContent = 2003;
     var dataString = "/" + crime + "/" + 2003;
     map.getSource("crimes").setData(dataString);
 });

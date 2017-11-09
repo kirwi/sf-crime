@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='sfCrime',
+    name='sfcrime',
     version="0.1",
-    packages=['sfCrime'],
+    packages=['sfcrime'],
     include_package_data=True,
     install_requires=[
         'flask',
@@ -13,7 +13,7 @@ setup(
         # If any package contains *.txt or *.rst files, include them:
         '': ['*.txt', '*.rst'],
         # And include any *.msg files found in the 'hello' package, too:
-        'sfCrime': ['*.msg'],
+        'sfcrime': ['*.msg'],
     },
 
     author="Kyle Irwin",
