@@ -2,6 +2,7 @@ from flask import Flask, render_template, jsonify
 from models import db, Crimes
 from sqlalchemy import extract, func, distinct
 import os
+from urllib.parse import unquote
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
@@ -12,8 +13,9 @@ def index():
     crimes = Crimes.query.with_entities(distinct(Crimes.cat)).all()
     return render_template('map.html', crimes=crimes)
 
-@app.route('/<crime>/<year>')
+@app.route('/<path:crime>/<year>')
 def geo_json(crime, year):
+    print(unquote(crime))
     points = Crimes.query.filter(Crimes.cat == crime
                 ).filter(extract('year', Crimes.datetime) == year
                 ).all()
@@ -22,7 +24,7 @@ def geo_json(crime, year):
         'features': [ point.geo_json_point() for point in points ]
     })
 
-@app.route('/agg/month/<crime>/<year>')
+@app.route('/agg/month/<path:crime>/<year>')
 def agg_date(crime, year):
     data = Crimes.query.with_entities(
         func.date_trunc('month', Crimes.datetime).label('month'),
@@ -39,7 +41,7 @@ def agg_date(crime, year):
             for date, occurrences in data ]
     })
 
-@app.route('/agg/day/<crime>/<year>')
+@app.route('/agg/day/<path:crime>/<year>')
 def agg_week(crime, year):
     week_days = {
         0: 'Sun',
