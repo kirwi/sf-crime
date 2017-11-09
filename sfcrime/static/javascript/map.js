@@ -93,7 +93,7 @@ var wedges = pieSvg.append("g")
 var linesX = d3.scaleTime().rangeRound([0, width]),
     linesY = d3.scaleLinear().rangeRound([height, 0]),
     radius = Math.min(containerWidth, containerHeight) / 2,
-    color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b",
+    color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#546ef7", "#6b486b",
         "#a05d56", "#d0743c", "#ff8c00"]);
 
 var line = d3.line()
