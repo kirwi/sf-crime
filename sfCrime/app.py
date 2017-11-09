@@ -5,6 +5,9 @@ from sfCrime.models import sfcrime
 from sfCrime import app
 from sqlalchemy import text
 
+from urllib.parse import unquote
+
+
 app = Flask(__name__)
 
 @app.route('/')
@@ -14,15 +17,22 @@ def index():
     crimes = Crimes.query(sfcrime.sfCrimes.cat).distinct().all()
     return render_template('map.html', crimes=crimes)
 
-@app.route('/<crime>/<year>')
+@app.route('/<path:crime>/<year>')
 def geo_json(crime, year):
+
     points = engine.execute()
+
+    print(unquote(crime))
+    points = Crimes.query.filter(Crimes.cat == crime
+                ).filter(extract('year', Crimes.datetime) == year
+                ).all()
+
     return jsonify({
         'type': 'FeatureCollection',
         'features': [ point.geo_json_point() for point in points ]
     })
 
-@app.route('/agg/month/<crime>/<year>')
+@app.route('/agg/month/<path:crime>/<year>')
 def agg_date(crime, year):
     connection = sfcrime.db_init()
     Crimes = connection
@@ -44,7 +54,7 @@ def agg_date(crime, year):
             for date, occurrences in data ]
     })
 
-@app.route('/agg/day/<crime>/<year>')
+@app.route('/agg/day/<path:crime>/<year>')
 def agg_week(crime, year):
     week_days = {
         0: 'Sun',
