@@ -16,7 +16,10 @@ def index():
 
 @app.route('/<crime>/<year>')
 def geo_json(crime, year):
-    points = engine.execute()
+    connection = sfcrime.db_init()
+    Crimes = connection
+    points=Crimes.query(sfcrime.sfCrimes).filter(sfcrime.sfCrimes.cat == crime).filter(extract('year', sfcrime.sfCrimes.datetime) == year).all()
+
     return jsonify({
         'type': 'FeatureCollection',
         'features': [ point.geo_json_point() for point in points ]
@@ -26,17 +29,12 @@ def geo_json(crime, year):
 def agg_date(crime, year):
     connection = sfcrime.db_init()
     Crimes = connection
-    Crimes.query(sfcrime.sfCrimes).with_entities(func.date_trunc('month', sfcrime.sfCrimes.datetime).label('month'),
-                                                     func.count(sfcrime.sfCrimes.cat)).filter(Crimes.cat == crime).filter(extract('year',
-                                                        Crimes.datetime) == year).group_by('month').order_by('month').all
-    data = Crimes.query.with_entities(
-        func.date_trunc('month', Crimes.datetime).label('month'),
-        func.count(Crimes.cat)
-        ).filter(Crimes.cat == crime
-        ).filter(extract('year', Crimes.datetime) == year
-        ).group_by('month'
-        ).order_by('month'
-        ).all()
+    data=Crimes.query(sfcrime.sfCrimes).with_entities(func.date_trunc('month',
+                                    sfcrime.sfCrimes.datetime).label('month'),
+                                   func.count(sfcrime.
+                                    sfCrimes.cat)).\
+                                    filter(sfcrime.sfCrimes.cat == crime). \
+                                    filter(extract('year', sfcrime.sfCrimes.datetime) == year).group_by('month').order_by('month').all()
 
     return jsonify({
         'crime': crime,
@@ -55,15 +53,11 @@ def agg_week(crime, year):
         5: 'Fri',
         6: 'Sat'
     }
-
-    data = Crimes.query.with_entities(
-        extract('dow', Crimes.datetime).label('day'),
-        func.count(Crimes.cat)
-        ).filter(Crimes.cat == crime
-        ).filter(extract('year', Crimes.datetime) == year
-        ).group_by('day'
-        ).order_by('day'
-        ).all()
+    data = Crimes.query(sfcrime.sfCrimes).with_entities(func.date_trunc('dow',
+                                          sfcrime.sfCrimes.datetime).label('day'),
+                                          func.count(sfcrime.sfCrimes.cat)).filter(sfcrime.sfCrimes.cat == crime
+                                                                                   ).filter(extract('year', sfcrime.sfCrimes.datetime) == year
+                                                                                            ).group_by('day').order_by('day').all()
 
     return jsonify({
         'crime': crime,
