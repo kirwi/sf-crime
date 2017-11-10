@@ -181,7 +181,7 @@ d3.select("#slider").on("change", function() {
             function(d) { return new Date(d.date); }));
         linesY.domain(d3.extent(data.aggregates,
             function(d) { return d.occurrences; }));
-        d3.select(".line").transition().duration(400)
+        d3.select(".line").transition().duration(750)
           .attr("d", line(data.aggregates));
     });
 
